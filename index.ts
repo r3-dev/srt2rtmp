@@ -93,4 +93,11 @@ async function SendSrtToRtmp(
 const srtUrl = env.SRT_URL;
 const rtmpUrl = env.RTMP_URL;
 
+// Run in loop with 1 second delay
+
+while (true) {
+  await SendSrtToRtmp(srtUrl, rtmpUrl);
+  await new Promise((resolve) => setTimeout(resolve, 1000));
+}
+
 await SendSrtToRtmp(srtUrl, rtmpUrl);
