@@ -1,15 +1,28 @@
 import { $, env } from "bun";
 
+interface IEncoderOptions {
+  audioBitrate?: number;
+  videoBitrate?: number;
+  bufferSize?: number;
+  frameRate?: number;
+}
+
 async function SendSrtToRtmp(
   srtUrl: string,
   rtmpUrl: string,
-  autoInstall = true
+  autoInstall = true,
+  encoderOptions: IEncoderOptions = {
+    audioBitrate: 44100,
+    videoBitrate: 8000,
+    bufferSize: 16000,
+    frameRate: 48,
+  }
 ) {
   if (!srtUrl) throw new Error("SRT URL is required");
   if (!rtmpUrl) throw new Error("RTMP URL is required");
 
   const ffmpeg =
-    await $`ffmpeg -re -i ${srtUrl} -ar 44100 -c:v libx264 -preset veryfast -maxrate 3000k -bufsize 6000k -pix_fmt yuv420p -g 60 -f flv "${rtmpUrl}"`;
+    await $`ffmpeg -i ${srtUrl} -ar ${encoderOptions.audioBitrate} -c:v libx264 -b:v ${encoderOptions.videoBitrate}k -bufsize ${encoderOptions.bufferSize}k  -r ${encoderOptions.frameRate} -f flv "${rtmpUrl}"`;
 
   if (ffmpeg.stderr !== null) {
     const error = ffmpeg.stderr.toString();
