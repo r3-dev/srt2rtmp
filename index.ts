@@ -1,16 +1,18 @@
 import { $, env } from "bun";
 
-const presets = {
-  ultrafast: "ultrafast",
-  superfast: "superfast",
-  veryfast: "veryfast",
-  faster: "faster",
-  fast: "fast",
-  medium: "medium",
-  slow: "slow",
-  slower: "slower",
-  veryslow: "veryslow",
-} as const;
+const ENCODING_PRESETS = [
+  "ultrafast",
+  "superfast",
+  "veryfast",
+  "faster",
+  "fast",
+  "medium",
+  "slow",
+  "slower",
+  "veryslow",
+] as const;
+
+type EncodingPreset = (typeof ENCODING_PRESETS)[number];
 
 interface IEncoderOptions {
   audioSamplingRate: number;
@@ -19,7 +21,7 @@ interface IEncoderOptions {
   inputBufferSizeInKB: number;
   bufferSize?: number;
   frameRate: number;
-  preset: (typeof presets)[keyof typeof presets];
+  preset: EncodingPreset;
   bframes: number;
 }
 
