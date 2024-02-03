@@ -40,21 +40,34 @@ async function SendSrtToRtmp(
   if (!srtUrl) throw new Error("SRT URL is required");
   if (!rtmpUrl) throw new Error("RTMP URL is required");
 
-  const ffmpeg = await $`ffmpeg -re -i ${
-    srtUrl +
-    "&recv_buffer_size=" +
-    encoderOptions.inputBufferSizeInKB * 1024 +
-    "&snddropdelay=" +
-    encoderOptions.reconnectDelayInSeconds * 1000 * 1000
-  } -ar ${
-    encoderOptions.audioSamplingRate
-  } -c:v libx264 -x264opts nal-hrd=cbr:bframes=${
-    encoderOptions.bframes
-  }:keyint=${2 * encoderOptions.frameRate}:no-scenecut -preset ${
-    encoderOptions.preset
-  } -c:a aac -b:a 160k -b:v ${encoderOptions.videoBitrate}k -bufsize ${
-    encoderOptions.bufferSize ?? encoderOptions.videoBitrate * 2
-  }k -filter:v fps=${encoderOptions.frameRate} -f flv "${rtmpUrl}"`;
+  const srtParams = {
+    recv_buffer_size: encoderOptions.inputBufferSizeInKB * 1024,
+    snddropdelay: encoderOptions.reconnectDelayInSeconds * 1000 * 1000,
+  };
+
+  const srtUrlWithParams = new URL(srtUrl);
+  for (const [key, value] of Object.entries(srtParams)) {
+    srtUrlWithParams.searchParams.append(key, value.toString());
+  }
+
+  const args = {
+    i: srtUrlWithParams.toString(),
+    ar: encoderOptions.audioSamplingRate,
+    cv: "libx264",
+    x264opts: `nal-hrd=cbr:bframes=${encoderOptions.bframes}:keyint=${
+      2 * encoderOptions.frameRate
+    }:no-scenecut`,
+    preset: encoderOptions.preset,
+    ca: "aac",
+    ba: "160k",
+    bv: `${encoderOptions.videoBitrate}k`,
+    bufsize: `${encoderOptions.bufferSize ?? encoderOptions.videoBitrate * 2}k`,
+    filterv: `fps=${encoderOptions.frameRate}`,
+    f: "flv",
+  };
+
+  const ffmpeg = await $`ffmpeg -re -i ${args.i}
+  } -ar ${args.ar} -c:v ${args.cv} -x264opts ${args.x264opts} -preset ${args.preset} -c:a ${args.ca} -b:a ${args.ba} -b:v ${args.bv} -bufsize ${args.bufsize}k -filter:v ${args.filterv} -f ${args.f} ${rtmpUrl}`;
 
   if (ffmpeg.stderr !== null) {
     const error = ffmpeg.stderr.toString();
