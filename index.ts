@@ -68,8 +68,8 @@ async function SendSrtToRtmp(
     f: "flv",
   };
 
-  const ffmpeg = await $`ffmpeg -re -i ${args.i}
-  -ar ${args.ar} -c:v ${args.cv} -x264opts ${args.x264opts} -preset ${args.preset} -c:a ${args.ca} -b:a ${args.ba} -b:v ${args.bv} -bufsize ${args.bufsize} -filter:v ${args.filterv} -f ${args.f} ${rtmpUrl}`;
+  const ffmpeg =
+    await $`ffmpeg -re -i ${args.i} -ar ${args.ar} -c:v ${args.cv} -x264opts ${args.x264opts} -preset ${args.preset} -c:a ${args.ca} -b:a ${args.ba} -b:v ${args.bv} -bufsize ${args.bufsize} -filter:v ${args.filterv} -f ${args.f} ${rtmpUrl}`;
 
   if (ffmpeg.stderr !== null) {
     const error = ffmpeg.stderr.toString();
