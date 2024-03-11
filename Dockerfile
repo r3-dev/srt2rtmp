@@ -2,7 +2,7 @@
 # TODO: REBUILD IMAGE FOR ALPINE
 # https://pkgs.alpinelinux.org/packages
 
-FROM ubuntu:20.04 AS base-ubuntu
+FROM debian:stable-slim AS base
 
 RUN apt-get -qq update && apt-get -qq upgrade
 
@@ -41,7 +41,7 @@ WORKDIR /
 
 
 
-FROM oven/bun:alpine AS builder
+FROM oven/bun:debian AS builder
 WORKDIR /app
 COPY bun.lockb .
 COPY package.json .
