@@ -98,6 +98,9 @@ async function SendSrtToRtmp(
 
       return SendSrtToRtmp(srtUrl, rtmpUrl, false);
     }
+
+    await Bun.sleep(1000);
+    return SendSrtToRtmp(srtUrl, rtmpUrl);
   }
 
   for (const line of ffmpeg.stdout.toString()) {
@@ -110,9 +113,11 @@ const rtmpUrl = env.RTMP_URL;
 
 // Run in loop with 1 second delay
 
-while (true) {
-  await SendSrtToRtmp(srtUrl, rtmpUrl);
-  await new Promise((resolve) => setTimeout(resolve, 1000));
-}
+Bun.serve({
+  fetch(req: Request): Response | Promise<Response> {
+    return new Response("Hello World!");
+  },
+  port: process.env.PORT || 3000,
+});
 
 await SendSrtToRtmp(srtUrl, rtmpUrl);
