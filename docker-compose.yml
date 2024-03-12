@@ -4,7 +4,7 @@ services:
     container_name: orange
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: ffmpeg.Dockerfile
       # reference docker target
       target: release
     restart: unless-stopped
@@ -24,7 +24,7 @@ services:
     container_name: green
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: ffmpeg.Dockerfile
       # reference docker target
       target: release
     restart: unless-stopped
