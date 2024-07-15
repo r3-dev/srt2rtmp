@@ -95,7 +95,7 @@ RUN cd /root/source/ffmpeg && \
 #################################
 # prodduction stage
 #################################
-FROM milanrodd/ffmpeg-srt2rtmp:latest AS release
+FROM milanrodd/srt2rtmp-ffmpeg:buildx-latest AS release
 COPY --from=bun-builder /app/srt2rtmp /app/
 EXPOSE 3000/tcp
 RUN chmod +x /app/srt2rtmp
