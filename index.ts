@@ -68,44 +68,21 @@ async function SendSrtToRtmp(
     f: "flv",
   };
 
-  const ffmpeg =
-    await $`ffmpeg -re -i ${args.i} -ar ${args.ar} -c:v ${args.cv} -x264opts ${args.x264opts} -preset ${args.preset} -c:a ${args.ca} -b:a ${args.ba} -b:v ${args.bv} -bufsize ${args.bufsize} -filter:v ${args.filterv} -f ${args.f} ${rtmpUrl}`;
+  const { stdout, stderr, exitCode, } = await $`ffmpeg -re -i ${args.i} -ar ${args.ar} -c:v ${args.cv} -x264opts ${args.x264opts} -preset ${args.preset} -c:a ${args.ca} -b:a ${args.ba} -b:v ${args.bv} -bufsize ${args.bufsize} -filter:v ${args.filterv} -f ${args.f} ${rtmpUrl}`
+  .nothrow()
+  .quiet()
 
-  if (ffmpeg.stderr !== null) {
-    const error = ffmpeg.stderr.toString();
-
-    if (error.includes("command not found: ffmpeg")) {
-      if (!autoInstall) {
-        throw new Error("ffmpeg is not installed");
-      }
-
-      console.log("Installing ffmpeg...");
-
-      switch (env.OS) {
-        case "darwin":
-          // macOS
-          await $`brew install ffmpeg`;
-          break;
-        case "linux":
-          // Linux
-          await $`sudo apt-get install ffmpeg`;
-          break;
-        case "windows":
-          // Windows
-          await $`choco install ffmpeg`;
-          break;
-      }
-
-      return SendSrtToRtmp(srtUrl, rtmpUrl, false);
-    }
-
-    await Bun.sleep(1000);
-    return SendSrtToRtmp(srtUrl, rtmpUrl);
+  if (exitCode !== 0) {
+    console.log(`Non-zero exit code ${exitCode}`);
   }
 
-  for (const line of ffmpeg.stdout.toString()) {
-    console.log(line);
-  }
+
+  console.log(stdout.toString());
+  console.log(stderr.toString());
+
+  Bun.sleep(1000);
+    
+  return SendSrtToRtmp(srtUrl, rtmpUrl);
 }
 
 const srtUrl = env.SRT_URL;
@@ -117,7 +94,7 @@ Bun.serve({
   fetch(req: Request): Response | Promise<Response> {
     return new Response("Hello World!");
   },
-  port: process.env.PORT || 3000,
+  port: process.env.PORT,
 });
 
-await SendSrtToRtmp(srtUrl, rtmpUrl);
+new Promise(() => SendSrtToRtmp(srtUrl, rtmpUrl));

@@ -7,13 +7,12 @@
     "build": "bun build ./index.ts --compile --outfile srt2rtmp",
     "start": "./srt2rtmp"
   },
-  "devDependencies": {
-    "@types/bun": "latest"
-  },
+  "devDependencies": {},
   "peerDependencies": {
-    "typescript": "^5.0.0"
+    "typescript": "^5.3.3"
   },
   "dependencies": {
-    "bun": "^1.0.30"
+    "@types/bun": "^1.1.6",
+    "bun": "^1.1.20"
   }
 }
