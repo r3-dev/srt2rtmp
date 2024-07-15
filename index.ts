@@ -35,7 +35,7 @@ async function SendSrtToRtmp(
     inputBufferSizeInKB: 1024,
     reconnectDelayInSeconds: 2,
     frameRate: 48,
-    preset: "superfast",
+    preset: "ultrafast",
     bframes: 2,
   }
 ) {
